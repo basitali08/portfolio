@@ -109,6 +109,8 @@ section{position:relative;z-index:1;padding:140px 48px;min-height:100vh;display:
 .edu-card p{font-size:.78rem;color:var(--text2);line-height:1.5}
 .edu-card .cert-link{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;color:var(--accent2);text-decoration:none;margin-top:10px;transition:.3s}
 .edu-card .cert-link:hover{color:var(--accent3);gap:10px}
+.edu-card .cert-seal{width:32px;height:32px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff;margin-bottom:10px;box-shadow:0 0 20px rgba(124,92,191,.3)}
+.edu-card .cert-badge{display:inline-block;padding:2px 10px;border-radius:100px;font-size:.55rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(94,234,212,.1);color:var(--accent3);border:1px solid rgba(94,234,212,.15);margin-bottom:8px}
 
 /* ─── Skills ─── */
 .skills-cloud{display:flex;flex-wrap:wrap;gap:8px;max-width:700px}
@@ -319,20 +321,24 @@ section{padding:80px 20px}
     <h2 class="section-title reveal">Credentials<br>&amp; Learning</h2>
     <p class="section-desc reveal">Academic background and professional certifications.</p>
     <div class="edu-grid">
-      <div class="edu-card reveal">
-        <div class="icon"><i class="fas fa-robot"></i></div>
+      <div class="edu-card reveal" style="border:1px solid rgba(124,92,191,.15)">
+        <div class="cert-seal"><i class="fas fa-certificate"></i></div>
+        <div class="cert-badge">BIA Certified</div>
         <h4>Artificial Intelligence</h4>
         <div class="meta"><i class="fas fa-calendar"></i> Completed Jan 2026</div>
         <div class="meta"><i class="fas fa-university"></i> Boston Institute of Analytics — Pakistan</div>
-        <p>Intensive classroom program covering machine learning, deep learning, neural networks, NLP, and AI system design. Hands-on projects with real-world datasets.</p>
+        <div class="meta"><i class="fas fa-clock"></i> Classroom Program</div>
+        <p>Intensive program covering machine learning, deep learning, neural networks, NLP, and AI system design. Hands-on projects with real-world datasets and industry case studies.</p>
         <a href="Basit_Ali_ARTIFICIAL_INTELLIGENCE_Certificate.pdf" target="_blank" class="cert-link"><i class="fas fa-file-pdf"></i> View Certificate →</a>
       </div>
-      <div class="edu-card reveal reveal-delay-1">
-        <div class="icon"><i class="fas fa-database"></i></div>
+      <div class="edu-card reveal reveal-delay-1" style="border:1px solid rgba(167,139,250,.15)">
+        <div class="cert-seal" style="background:linear-gradient(135deg,#a78bfa,#f472b6)"><i class="fas fa-certificate"></i></div>
+        <div class="cert-badge">BIA Certified</div>
         <h4>Data Science</h4>
         <div class="meta"><i class="fas fa-calendar"></i> Completed Jan 2026</div>
         <div class="meta"><i class="fas fa-university"></i> Boston Institute of Analytics — Pakistan</div>
-        <p>Comprehensive program covering Python, SQL, statistical analysis, predictive modeling, data visualization, and ML deployment. Built multiple end-to-end projects.</p>
+        <div class="meta"><i class="fas fa-clock"></i> Classroom Program</div>
+        <p>Comprehensive program covering Python, SQL, statistical analysis, predictive modeling, data visualization, and ML deployment. Built multiple end-to-end projects with real datasets.</p>
         <a href="Basit_Ali_DATA_SCIENCE_Certificate.pdf" target="_blank" class="cert-link"><i class="fas fa-file-pdf"></i> View Certificate →</a>
       </div>
       <div class="edu-card reveal reveal-delay-2">

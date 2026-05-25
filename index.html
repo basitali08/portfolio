@@ -198,7 +198,7 @@ section{padding:80px 20px}
       <div class="label reveal">Data Scientist &amp; AI Engineer</div>
       <h1 class="reveal">Basit<br><span class="hl">Ali</span></h1>
       <p class="sub reveal">Building intelligent systems that transform raw data into production-ready ML solutions. Specializing in predictive modeling, AI pipelines, and end-to-end data science.</p>
-      <p class="loc reveal"><i class="fas fa-map-pin"></i> Islamabad, Pakistan</p>
+      <p class="loc reveal"><i class="fas fa-map-pin"></i> Pakistan</p>
       <div class="btns reveal">
         <a href="#projects" class="btn btn-primary"><i class="fas fa-arrow-down"></i> View Portfolio</a>
         <a href="#contact" class="btn btn-outline"><i class="fas fa-paper-plane"></i> Get in Touch</a>
@@ -259,27 +259,10 @@ section{padding:80px 20px}
       <div class="timeline-item reveal">
         <div class="period">Jun 2025 — Present</div>
         <h4>Senior Consultant Data Science</h4>
-        <div class="company">Systems Limited — Islamabad, Pakistan</div>
+        <div class="company">Systems Limited — Pakistan</div>
         <div class="desc">Building production ML systems and data pipelines for enterprise clients. Architecting end-to-end machine learning solutions for large-scale business applications.</div>
       </div>
-      <div class="timeline-item reveal">
-        <div class="period">Sep 2024 — May 2025</div>
-        <h4>AI Developer</h4>
-        <div class="company">PowerHouse</div>
-        <div class="desc">Developed AI-powered applications and machine learning models. Built intelligent automation systems and data-driven features for production environments.</div>
-      </div>
-      <div class="timeline-item reveal">
-        <div class="period">Jan 2024 — Mar 2025</div>
-        <h4>Senior AI Engineer</h4>
-        <div class="company">Decoditive</div>
-        <div class="desc">Led design and deployment of ML models for enterprise clients. Architected scalable AI solutions and mentored junior engineers on best practices.</div>
-      </div>
-      <div class="timeline-item reveal">
-        <div class="period">Jun 2022 — Feb 2024</div>
-        <h4>AI Engineer</h4>
-        <div class="company">Decoditive</div>
-        <div class="desc">Developed ML models and data pipelines for production environments. Built and maintained data infrastructure supporting multiple AI products.</div>
-      </div>
+
       <div class="timeline-item reveal">
         <div class="period">Aug 2025 — Jan 2026</div>
         <h4>Artificial Intelligence Program</h4>
@@ -327,6 +310,9 @@ section{padding:80px 20px}
           <a href="https://github.com/basitali08/neuron-receptor-prediction" target="_blank" class="gh"><i class="fab fa-github"></i> View Repository</a>
         </div>
       </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:32px">
+      <a href="https://github.com/basitali08?tab=repositories" target="_blank" class="btn btn-outline"><i class="fab fa-github"></i> View All Repositories</a>
     </div>
   </div>
 </section>
@@ -479,8 +465,16 @@ scene.add(particles);
 
 camera.position.z = 6;
 
-// ─── Scroll-driven 3D Animation ───
+// ─── Parallax Layers ───
+const parallaxElements = [];
+document.querySelectorAll('section').forEach((el, i) => {
+  const speed = 0.08 + (i % 3) * 0.04;
+  parallaxElements.push({ el, speed, offset: 0 });
+});
+
+// ─── Scroll-driven 3D + Parallax ───
 let scrollY = 0;
+let smoothScroll = 0;
 window.addEventListener('scroll', () => {
   scrollY = window.scrollY / (document.body.scrollHeight - window.innerHeight);
 }, { passive: true });
@@ -493,29 +487,34 @@ document.addEventListener('mousemove', e => {
 
 function animate() {
   requestAnimationFrame(animate);
-  // Scroll-driven transformations
-  const s = scrollY || 0;
-  // Rotate faster as user scrolls
-  knot.rotation.x += 0.003 + s * 0.008;
-  knot.rotation.y += 0.006 + s * 0.012;
-  // Second knot spins opposite
-  knot2.rotation.x -= 0.005 - s * 0.006;
-  knot2.rotation.y += 0.004 + s * 0.01;
-  // Scale knot based on scroll
-  const scale = 1 + s * 0.6;
+  // Smooth scroll interpolation
+  smoothScroll += (scrollY - smoothScroll) * 0.05;
+  const s = smoothScroll || 0;
+
+  // ── Parallax sections ──
+  const viewH = window.innerHeight;
+  parallaxElements.forEach(p => {
+    const rect = p.el.getBoundingClientRect();
+    const center = (rect.top + rect.height / 2) / viewH;
+    const delta = 0.5 - center;
+    p.el.style.transform = `translateY(${delta * p.speed * 100}px)`;
+  });
+
+  // ── Scroll-linked 3D ──
+  knot.rotation.x += 0.003 + s * 0.012;
+  knot.rotation.y += 0.006 + s * 0.018;
+  knot2.rotation.x -= 0.005 - s * 0.008;
+  knot2.rotation.y += 0.004 + s * 0.014;
+  const scale = 1 + s * 0.8;
   knot.scale.set(scale, scale, scale);
-  // Particles drift and spread
-  particles.rotation.y += 0.0003 + s * 0.001;
-  // Opacity pulse with scroll
-  knot.material.opacity = 0.2 + s * 0.3;
-  knot2.material.opacity = 0.12 + s * 0.2;
-  // Camera subtle movement
-  camera.position.z = 6 - s * 1.5;
-  // Mouse parallax
-  knot.position.x = 3 + mouseX * (0.3 + s * 0.2);
-  knot.position.y = -0.5 - mouseY * (0.3 + s * 0.2);
-  knot2.position.x = -2.8 + mouseX * (0.2 + s * 0.15);
-  knot2.position.y = 1.8 - mouseY * (0.2 + s * 0.15);
+  particles.rotation.y += 0.0003 + s * 0.0015;
+  knot.material.opacity = 0.2 + s * 0.35;
+  knot2.material.opacity = 0.12 + s * 0.25;
+  camera.position.z = 6 - s * 2;
+  knot.position.x = 3 + mouseX * (0.3 + s * 0.25);
+  knot.position.y = -0.5 - mouseY * (0.3 + s * 0.25);
+  knot2.position.x = -2.8 + mouseX * (0.2 + s * 0.2);
+  knot2.position.y = 1.8 - mouseY * (0.2 + s * 0.2);
   renderer.render(scene, camera);
 }
 animate();

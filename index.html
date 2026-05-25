@@ -256,12 +256,7 @@ section{padding:80px 20px}
         <div class="company">Boston Institute of Analytics — Lahore, Pakistan (On-site)</div>
         <div class="desc">Leading data science initiatives, developing predictive models, and delivering AI-driven solutions for real-world business challenges.</div>
       </div>
-      <div class="timeline-item reveal">
-        <div class="period">Jun 2025 — Present</div>
-        <h4>Senior Consultant Data Science</h4>
-        <div class="company">Systems Limited — Pakistan</div>
-        <div class="desc">Building production ML systems and data pipelines for enterprise clients. Architecting end-to-end machine learning solutions for large-scale business applications.</div>
-      </div>
+
 
       <div class="timeline-item reveal">
         <div class="period">Aug 2025 — Jan 2026</div>
@@ -431,37 +426,94 @@ const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true 
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Torus Knot (hero)
-const geo = new THREE.TorusKnotGeometry(1.2, 0.4, 180, 24);
-const mat = new THREE.MeshBasicMaterial({ color: 0x7c5cbf, wireframe: true, transparent: true, opacity: 0.2 });
+// ─── Group for organized movement ───
+const world = new THREE.Group();
+scene.add(world);
+
+// ─── Main Torus Knot ───
+const geo = new THREE.TorusKnotGeometry(1.4, 0.45, 200, 32);
+const mat = new THREE.MeshBasicMaterial({ color: 0x7c5cbf, wireframe: true, transparent: true, opacity: 0.25 });
 const knot = new THREE.Mesh(geo, mat);
-knot.position.set(3, -0.5, -4);
-scene.add(knot);
+knot.position.set(3.5, -0.5, -4);
+world.add(knot);
 
-// Secondary knot
-const geo2 = new THREE.TorusKnotGeometry(0.7, 0.25, 120, 16);
-const mat2 = new THREE.MeshBasicMaterial({ color: 0x5eead4, wireframe: true, transparent: true, opacity: 0.12 });
+// ─── Secondary knot ───
+const geo2 = new THREE.TorusKnotGeometry(0.8, 0.28, 140, 20);
+const mat2 = new THREE.MeshBasicMaterial({ color: 0x5eead4, wireframe: true, transparent: true, opacity: 0.15 });
 const knot2 = new THREE.Mesh(geo2, mat2);
-knot2.position.set(-2.8, 1.8, -6);
-scene.add(knot2);
+knot2.position.set(-3, 2, -6);
+world.add(knot2);
 
-// Particles
-const particleCount = 1000;
+// ─── Icosahedron ───
+const ico = new THREE.IcosahedronGeometry(0.5, 0);
+const icoMat = new THREE.MeshBasicMaterial({ color: 0xf472b6, wireframe: true, transparent: true, opacity: 0.12 });
+const icoMesh = new THREE.Mesh(ico, icoMat);
+icoMesh.position.set(0, -2.5, -3);
+world.add(icoMesh);
+
+// ─── Orbital rings ───
+const ringMat = new THREE.MeshBasicMaterial({ color: 0xa78bfa, wireframe: true, transparent: true, opacity: 0.06 });
+for (let i = 0; i < 3; i++) {
+  const r = new THREE.Mesh(new THREE.TorusGeometry(2 + i * 0.8, 0.02, 8, 60), ringMat);
+  r.rotation.x = Math.PI / 3 + i * 0.4;
+  r.rotation.y = i * 0.5;
+  r.position.z = -3 - i * 1.5;
+  world.add(r);
+}
+
+// ─── Particle system ───
+const particleCount = 1500;
 const pos = new Float32Array(particleCount * 3);
 const colors = new Float32Array(particleCount * 3);
+const sizes = new Float32Array(particleCount);
 for (let i = 0; i < particleCount; i++) {
-  pos[i*3] = (Math.random() - 0.5) * 30;
-  pos[i*3+1] = (Math.random() - 0.5) * 30;
-  pos[i*3+2] = (Math.random() - 0.5) * 20;
-  const c = new THREE.Color().setHSL(0.72 + Math.random() * 0.1, 0.6, 0.5);
+  pos[i*3] = (Math.random() - 0.5) * 35;
+  pos[i*3+1] = (Math.random() - 0.5) * 35;
+  pos[i*3+2] = (Math.random() - 0.5) * 25;
+  const hue = 0.7 + Math.random() * 0.2;
+  const c = new THREE.Color().setHSL(hue, 0.6, 0.4 + Math.random() * 0.2);
   colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+  sizes[i] = 0.02 + Math.random() * 0.05;
 }
 const particleGeo = new THREE.BufferGeometry();
 particleGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
 particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-const particleMat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.5 });
+particleGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+const particleMat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.5, sizeAttenuation: true });
 const particles = new THREE.Points(particleGeo, particleMat);
-scene.add(particles);
+world.add(particles);
+
+// ─── Particle connections (lines) ───
+const lineGeo = new THREE.BufferGeometry();
+const linePositions = [];
+const threshold = 2.5;
+for (let i = 0; i < particleCount; i++) {
+  for (let j = i + 1; j < particleCount; j++) {
+    const dx = pos[i*3] - pos[j*3];
+    const dy = pos[i*3+1] - pos[j*3+1];
+    const dz = pos[i*3+2] - pos[j*3+2];
+    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    if (dist < threshold) {
+      linePositions.push(pos[i*3], pos[i*3+1], pos[i*3+2], pos[j*3], pos[j*3+1], pos[j*3+2]);
+    }
+  }
+}
+const lineBuf = new Float32Array(linePositions);
+const linesGeo = new THREE.BufferGeometry();
+linesGeo.setAttribute('position', new THREE.BufferAttribute(lineBuf, 3));
+const linesMat = new THREE.LineBasicMaterial({ color: 0x7c5cbf, transparent: true, opacity: 0.04 });
+const lines = new THREE.LineSegments(linesGeo, linesMat);
+world.add(lines);
+
+// ─── Star field (distant) ───
+const starCount = 600;
+const starPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount * 3; i++) starPos[i] = (Math.random() - 0.5) * 80;
+const starGeo = new THREE.BufferGeometry();
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.015, transparent: true, opacity: 0.3 });
+const stars = new THREE.Points(starGeo, starMat);
+scene.add(stars);
 
 camera.position.z = 6;
 
@@ -501,20 +553,45 @@ function animate() {
   });
 
   // ── Scroll-linked 3D ──
-  knot.rotation.x += 0.003 + s * 0.012;
-  knot.rotation.y += 0.006 + s * 0.018;
-  knot2.rotation.x -= 0.005 - s * 0.008;
-  knot2.rotation.y += 0.004 + s * 0.014;
-  const scale = 1 + s * 0.8;
+  knot.rotation.x += 0.004 + s * 0.015;
+  knot.rotation.y += 0.007 + s * 0.02;
+  knot2.rotation.x -= 0.006 - s * 0.01;
+  knot2.rotation.y += 0.005 + s * 0.016;
+  icoMesh.rotation.x += 0.002 + s * 0.008;
+  icoMesh.rotation.y += 0.003 + s * 0.01;
+  const scale = 1 + s * 0.9;
   knot.scale.set(scale, scale, scale);
-  particles.rotation.y += 0.0003 + s * 0.0015;
-  knot.material.opacity = 0.2 + s * 0.35;
-  knot2.material.opacity = 0.12 + s * 0.25;
-  camera.position.z = 6 - s * 2;
-  knot.position.x = 3 + mouseX * (0.3 + s * 0.25);
-  knot.position.y = -0.5 - mouseY * (0.3 + s * 0.25);
-  knot2.position.x = -2.8 + mouseX * (0.2 + s * 0.2);
-  knot2.position.y = 1.8 - mouseY * (0.2 + s * 0.2);
+  knot2.scale.set(1 + s * 0.5, 1 + s * 0.5, 1 + s * 0.5);
+  particles.rotation.y += 0.0004 + s * 0.002;
+  particles.rotation.x += 0.0002 - s * 0.001;
+  lines.rotation.y += 0.0002 + s * 0.001;
+  stars.rotation.y += 0.0001;
+  // Opacity pulse
+  knot.material.opacity = 0.25 + s * 0.35 + Math.sin(Date.now() * 0.001) * 0.05;
+  knot2.material.opacity = 0.15 + s * 0.25 + Math.sin(Date.now() * 0.0013) * 0.03;
+  icoMesh.material.opacity = 0.12 + s * 0.2;
+  // Color shift with scroll
+  const hue = 0.72 - s * 0.15;
+  knot.material.color.setHSL(hue, 0.7, 0.5);
+  knot2.material.color.setHSL(0.45 + s * 0.15, 0.7, 0.5);
+  // Camera pull + tilt
+  camera.position.z = 6 - s * 2.5;
+  camera.position.y = s * 0.5;
+  // Orbital ring rotation
+  world.children.forEach((child, i) => {
+    if (child.type === 'Mesh' && child.geometry.type === 'TorusGeometry') {
+      child.rotation.z += 0.002 + s * 0.005;
+      child.rotation.x += 0.001 + s * 0.003;
+    }
+  });
+  // Mouse parallax
+  knot.position.x = 3.5 + mouseX * (0.35 + s * 0.3);
+  knot.position.y = -0.5 - mouseY * (0.35 + s * 0.3);
+  knot2.position.x = -3 + mouseX * (0.25 + s * 0.25);
+  knot2.position.y = 2 - mouseY * (0.25 + s * 0.25);
+  icoMesh.position.x = 0 + mouseX * 0.15;
+  icoMesh.position.y = -2.5 - mouseY * 0.15;
+  world.position.y = s * 0.3;
   renderer.render(scene, camera);
 }
 animate();
